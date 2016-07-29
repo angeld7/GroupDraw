@@ -1,5 +1,6 @@
 package edu.drexel.cs338;
 
+import edu.drexel.cs338.constants.UIConstants;
 import edu.drexel.cs338.ui.TitleScreen;
 
 import javax.swing.*;
@@ -18,7 +19,7 @@ public class GroupDraw {
      * This creates the basic frame of teh application and attaches the main screen to it
      */
     private void createAndShowGUI() {
-        final JFrame frame = new JFrame("Group Draw");
+        final JFrame frame = new JFrame(UIConstants.TITLE);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(800, 600));
 
