@@ -18,8 +18,7 @@
 		Build Command:
 		    ant
 		Run Command:
-		    java GroupDraw
-
+		    java edu.drexel.cs338.GroupDraw
 
 
 	-------------
