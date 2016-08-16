@@ -1,6 +1,7 @@
 package edu.drexel.cs338;
 
 import edu.drexel.cs338.constants.UIConstants;
+import edu.drexel.cs338.ui.AppController;
 import edu.drexel.cs338.ui.TitleScreen;
 
 import javax.swing.*;
@@ -23,11 +24,10 @@ public class GroupDraw {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(800, 600));
 
-        //Attach the main screen
-        frame.add(new TitleScreen());
+        AppController controller = new AppController(frame);
+        controller.display(new TitleScreen(controller));
 
         //Display the window.
-        frame.pack();
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
