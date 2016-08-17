@@ -2,13 +2,11 @@ package edu.drexel.cs338.ui.handlers;
 
 import edu.drexel.cs338.ui.CanvasPanel;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.text.MessageFormat;
 
 /**
  * Created by Angel on 8/15/2016.
@@ -58,7 +56,7 @@ public class DrawHandler implements MouseListener, MouseMotionListener {
     }
 
     public void setErasing(boolean erasing) {
-        if(erasing) {
+        if (erasing) {
             g2d.setColor(backgroundColor);
         } else {
             g2d.setColor(color);

@@ -1,0 +1,39 @@
+=============
+    Angel Delgado
+    ald363
+    Project
+    Group Draw
+    =============
+
+
+    -------------
+    Java Version
+    -------------
+        1.8
+
+
+      -------------
+      Running It
+      -------------
+		Build Command:
+		    ant
+		Run Command:
+		    java edu.drexel.cs338.GroupDraw
+
+
+	-------------
+	What Works
+	-------------
+
+
+
+	  -------------
+	  What doesn't
+	  -------------
+
+
+
+	    -------------
+	    NOTES
+	    -------------
+
