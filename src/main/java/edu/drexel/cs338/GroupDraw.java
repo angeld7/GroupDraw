@@ -1,6 +1,7 @@
 package edu.drexel.cs338;
 
 import edu.drexel.cs338.constants.UIConstants;
+import edu.drexel.cs338.data.FirebaseController;
 import edu.drexel.cs338.ui.AppController;
 import edu.drexel.cs338.ui.TitleScreen;
 
@@ -14,6 +15,7 @@ public class GroupDraw {
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(() -> new GroupDraw().createAndShowGUI());
+        new FirebaseController();
     }
 
     /**
