@@ -1,4 +1,4 @@
-package edu.drexel.cs338.ui.handlers;
+package edu.drexel.cs338.interfaces;
 
 import edu.drexel.cs338.ui.CanvasPanel;
 
@@ -34,12 +34,16 @@ public class DrawHandler implements MouseListener, MouseMotionListener {
         int height = (int) Math.round(dimension.getHeight());
         image = (BufferedImage) panel.createImage(width, height);
         g2d = image.createGraphics();
-        g2d.setColor(backgroundColor);
-        g2d.fillRect(0, 0, width, height);
-        g2d.setColor(color);
+        clearImage();
         stroke = new BasicStroke(size);
         g2d.setStroke(stroke);
         panel.setImage(image);
+    }
+
+    public void clearImage(){
+        g2d.setColor(backgroundColor);
+        g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
+        g2d.setColor(color);
     }
 
     public Color getColor() {
@@ -81,9 +85,13 @@ public class DrawHandler implements MouseListener, MouseMotionListener {
         return image;
     }
 
-    public void drawTo(int x, int y) {
-        g2d.drawLine((int) Math.round(lastPoint.getX()), (int) Math.round(lastPoint.getY()), x, y);
+    private void drawTo(int x, int y) {
+        drawLine((int) Math.round(lastPoint.getX()), (int) Math.round(lastPoint.getY()), x, y);
         lastPoint = new Point(x, y);
+    }
+
+    public void drawLine(int x1, int y1, int x2, int y2) {
+        g2d.drawLine(x1, y1, x2, y2);
         panel.revalidate();
         panel.repaint();
     }

@@ -15,7 +15,6 @@ public class GroupDraw {
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(() -> new GroupDraw().createAndShowGUI());
-        new FirebaseController();
     }
 
     /**

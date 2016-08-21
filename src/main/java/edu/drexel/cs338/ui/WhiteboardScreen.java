@@ -1,12 +1,12 @@
 package edu.drexel.cs338.ui;
 
-import edu.drexel.cs338.ui.handlers.DrawHandler;
+import edu.drexel.cs338.data.Whiteboard;
+import edu.drexel.cs338.interfaces.DrawHandler;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -14,12 +14,14 @@ import java.io.IOException;
  * Created by Angel on 8/15/2016.
  */
 public class WhiteboardScreen extends JPanel {
-    AppController controller;
-    DrawHandler drawHandler;
+    private Whiteboard whiteboard;
+    private AppController controller;
+    private DrawHandler drawHandler;
 
-    public WhiteboardScreen(AppController controller) {
+    public WhiteboardScreen(AppController controller, Whiteboard whiteboard) {
         super(new BorderLayout());
         this.controller = controller;
+        this.whiteboard = whiteboard;
         initComponents();
     }
 
@@ -28,7 +30,7 @@ public class WhiteboardScreen extends JPanel {
         drawHandler = new DrawHandler(drawingPanel);
         drawingPanel.setBackground(drawHandler.getBackgroundColor());
 
-        JLabel title = new JLabel("Room 1");
+        JLabel title = new JLabel(whiteboard.getName());
 
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
@@ -109,6 +111,7 @@ public class WhiteboardScreen extends JPanel {
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
                     "PNG Images", "png");
             fileChooser.setFileFilter(filter);
+            fileChooser.setSelectedFile(new File(whiteboard.getName() + ".png"));
             int returnValue = fileChooser.showSaveDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
@@ -141,4 +144,7 @@ public class WhiteboardScreen extends JPanel {
         drawHandler.createImage();
     }
 
+    public DrawHandler getDrawHandler() {
+        return drawHandler;
+    }
 }

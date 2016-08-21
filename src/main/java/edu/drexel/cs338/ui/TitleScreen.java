@@ -22,17 +22,13 @@ public class TitleScreen extends JPanel {
     private void initComponents() {
         JLabel title = new JLabel(UIConstants.TITLE);
         title.setFont(new Font("Sans-Serif", Font.BOLD, 75));
-            title.setBorder(BorderFactory.createEmptyBorder(50,50,100,50));
-        Dimension buttonDimensions = new Dimension(10000,50);
+        title.setBorder(BorderFactory.createEmptyBorder(50, 50, 100, 50));
+        Dimension buttonDimensions = new Dimension(10000, 50);
         JButton create = new JButton("Create Whiteboard");
-        create.addActionListener(e -> {
-            WhiteboardScreen whiteboard = new WhiteboardScreen(controller);
-            controller.display(whiteboard);
-            whiteboard.createImage();
-        });
+        create.addActionListener(e -> controller.display(new CreateWhiteboardScreen(controller)));
 
         JButton join = new JButton("Join Whiteboard");
-        join.setEnabled(false);
+        join.addActionListener(e -> controller.display(new JoinWhiteboardScreen(controller)));
 
         create.setPreferredSize(buttonDimensions);
         join.setPreferredSize(buttonDimensions);

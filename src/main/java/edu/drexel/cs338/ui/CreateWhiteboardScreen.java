@@ -1,59 +1,180 @@
 package edu.drexel.cs338.ui;
 
-import edu.drexel.cs338.constants.UIConstants;
+import edu.drexel.cs338.interfaces.PassFailHandler;
+import edu.drexel.cs338.data.FirebaseController;
+import edu.drexel.cs338.data.Whiteboard;
+import edu.drexel.cs338.interfaces.InputValidationPassFailHandler;
+import edu.drexel.cs338.utility.FormUtility;
+import edu.drexel.cs338.ui.components.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by Angel on 8/15/2016.
  */
 public class CreateWhiteboardScreen extends JPanel {
+    private static final String CREATE_WHITEBOARD = "Create Whiteboard";
+    private static final String YOUR_NAME = "Your Name";
+    private static final String WHITEBOARD_NAME = "Whiteboard Name";
+    private static final String PASSWORD_OPTIONAL = "Password (Optional)";
+    private static final String CREATE = "Create";
+    private static final String WHITEBOARD_NAME_IN_USE = "The whiteboard name is already in use";
+
+    /**
+     * Specifies the fields that ar currently failing validation
+     */
+    final private Set<JComponent> erroredComponents = new HashSet<>();
+
+    /**
+     * All fields on the form
+     */
+    final private List<JComponent> fields = new LinkedList<>();
+
     AppController controller;
+
+    JTextField nameField;
+    JLabel title;
+    JTextField whiteBoardTextField;
+    JTextField passwordTextField;
+    JLabel errorLabel;
+    JButton cancelButton;
+    JButton createButton;
 
     public CreateWhiteboardScreen(AppController controller) {
         super();
         this.controller = controller;
-        BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
-        setLayout(layout);
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         initComponents();
+        addComponents();
     }
 
     private void initComponents() {
-        JLabel title = new JLabel("Create Whiteboard");
-        title.setFont(new Font("Sans-Serif", Font.BOLD, 75));
-        title.setBorder(BorderFactory.createEmptyBorder(50, 50, 100, 50));
+        title = new JLabel(CREATE_WHITEBOARD);
+        title.setFont(new Font("Sans-Serif", Font.BOLD, 25));
+        title.setBorder(BorderFactory.createEmptyBorder(100, 0, 0, 0));
+        title.setAlignmentX(CENTER_ALIGNMENT);
+        nameField = new JTextField();
+        whiteBoardTextField = new JTextField();
+        passwordTextField = new JTextField();
+        errorLabel = new JLabel("");
+        errorLabel.setForeground(Color.RED);
+        errorLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+        createButton = new JButton(CREATE);
+        cancelButton = new CancelButton(controller);
+        fields.add(nameField);
+        fields.add(whiteBoardTextField);
 
-        JPanel middle = new JPanel(new GridLayout(3, 2));
+        InputValidationPassFailHandler passFailHandler = new InputValidationPassFailHandler() {
+            @Override
+            public void fail(String message, JComponent component) {
+                synchronized (erroredComponents) {
+                    erroredComponents.add(component);
+                }
+                errorLabel.setText(message);
+            }
 
-        JLabel nameLabel = new JLabel("Your Name: ");
-        JTextField nameField = new JTextField();
+            @Override
+            public void pass(JComponent component) {
+                synchronized (erroredComponents) {
+                    erroredComponents.remove(component);
+                }
+                errorLabel.setText("");
+            }
+        };
 
-        JLabel whiteboardLabel = new JLabel("Whiteboard Name: ");
-        JTextField whiteBoardTextField = new JTextField();
+        FormUtility.addRequiredValidator(nameField, passFailHandler, YOUR_NAME);
+        FormUtility.addRequiredValidator(whiteBoardTextField, passFailHandler, WHITEBOARD_NAME);
 
-        JLabel passwordLabel = new JLabel("Password (Optional): ");
-        JTextField passwordTextField = new JTextField();
+        createButton.addActionListener(e -> {
+            createButton.setEnabled(false);
+            cancelButton.setEnabled(false);
+            if (!hasErrors()) {
+                Whiteboard whiteboard = new Whiteboard(
+                        whiteBoardTextField.getText(),
+                        nameField.getText(),
+                        passwordTextField.getText());
 
-        middle.add(nameLabel);
-        middle.add(nameField);
-        middle.add(whiteboardLabel);
-        middle.add(whiteBoardTextField);
-        middle.add(passwordLabel);
-        middle.add(passwordTextField);
+                WhiteboardScreen screen = new WhiteboardScreen(controller, whiteboard);
 
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+                FirebaseController.get().createWhiteboard(whiteboard, screen.getDrawHandler(), new PassFailHandler() {
+                    @Override
+                    public void pass() {
+                        controller.display(screen);
+                        screen.createImage();
+                    }
 
-        JButton createButton = new JButton("Create");
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(e -> controller.goBack());
-
-        bottomPanel.add(createButton);
-        bottomPanel.add(cancelButton);
-
-        add(title);
-        add(middle);
-        add(bottomPanel);
+                    @Override
+                    public void fail() {
+                        createButton.setEnabled(true);
+                        cancelButton.setEnabled(true);
+                        FormUtility.validationFailed(whiteBoardTextField);
+                        whiteBoardTextField.requestFocus();
+                        passFailHandler.fail(WHITEBOARD_NAME_IN_USE, whiteBoardTextField);
+                    }
+                });
+            }
+        });
     }
+
+    private void addComponents() {
+        add(title);
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        FormUtility.addRequiredLabel(YOUR_NAME, formPanel);
+        FormUtility.addLastField(nameField, formPanel);
+
+        FormUtility.addRequiredLabel(WHITEBOARD_NAME, formPanel);
+        FormUtility.addLastField(whiteBoardTextField, formPanel);
+
+        FormUtility.addLabel(PASSWORD_OPTIONAL, formPanel);
+        FormUtility.addLastField(passwordTextField, formPanel);
+
+        formPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 100, 0));
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+
+        buttonPanel.add(Box.createHorizontalGlue());
+        buttonPanel.add(errorLabel);
+        buttonPanel.add(createButton);
+        buttonPanel.add(cancelButton);
+
+        add(formPanel);
+        add(Box.createVerticalGlue());
+        add(buttonPanel);
+    }
+
+    /**
+     * Validates all fields
+     *
+     * @return
+     */
+    public boolean hasErrors() {
+        boolean error;
+        synchronized (erroredComponents) {
+            error = erroredComponents.size() > 0;
+        }
+        Iterator<JComponent> iterator = fields.iterator();
+        while (!error && iterator.hasNext()) {
+            JComponent component = iterator.next();
+            InputVerifier verifier = component.getInputVerifier();
+            if (verifier != null) {
+                component.getInputVerifier().verify(component);
+            }
+        }
+        synchronized (erroredComponents) {
+            if (erroredComponents.size() > 0) {
+                JComponent component = erroredComponents.iterator().next();
+                InputVerifier verifier = component.getInputVerifier();
+                verifier.verify(component);
+                component.requestFocus();
+                error = true;
+            }
+        }
+
+        return error;
+    }
+
 }
