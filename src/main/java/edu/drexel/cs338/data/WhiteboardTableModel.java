@@ -39,7 +39,15 @@ public class WhiteboardTableModel implements TableModel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        return String.class;
+        Class<?> type = String.class;
+        switch (columnIndex) {
+            case 2:
+                type = Integer.class;
+                break;
+            case 3:
+                type = Boolean.class;
+        }
+        return type;
     }
 
     @Override
@@ -62,7 +70,7 @@ public class WhiteboardTableModel implements TableModel {
                 value = whiteboard.getUsers().size();
                 break;
             case 3:
-                value = whiteboard.getPassword().isEmpty() ? "No" : "Yes";
+                value = !whiteboard.getPassword().isEmpty();
         }
         return value;
     }
@@ -96,6 +104,18 @@ public class WhiteboardTableModel implements TableModel {
     public void removeRow(Whiteboard whiteboard) {
         data.remove(whiteboard);
         refreshData();
+    }
+
+    public void updateRow(Whiteboard whiteboard) {
+        if(data.contains(whiteboard)) {
+            data.remove(whiteboard);
+            data.add(whiteboard);
+            refreshData();
+        }
+    }
+
+    public Whiteboard getRow(int index) {
+        return data.get(index);
     }
 
     public void refreshData() {

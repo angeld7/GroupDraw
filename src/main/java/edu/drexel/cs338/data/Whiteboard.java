@@ -1,7 +1,7 @@
 package edu.drexel.cs338.data;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Angel on 8/21/2016.
@@ -10,7 +10,7 @@ public class Whiteboard {
     private String name;
     private String creator;
     private String password;
-    private Set users = new HashSet<>();
+    private List<String> users = new ArrayList<>();
 
     public Whiteboard() {
     }
@@ -45,16 +45,18 @@ public class Whiteboard {
         this.password = password;
     }
 
-    public Set getUsers() {
+    public List<String> getUsers() {
         return users;
     }
 
-    public void setUsers(Set users) {
+    public void setUsers(List<String> users) {
         this.users = users;
     }
 
     public void addUser(String user) {
-        users.add(user);
+        if(!users.contains(user)) {
+            users.add(user);
+        }
     }
 
     @Override

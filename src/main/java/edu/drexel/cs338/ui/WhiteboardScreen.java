@@ -31,6 +31,7 @@ public class WhiteboardScreen extends JPanel {
         drawingPanel.setBackground(drawHandler.getBackgroundColor());
 
         JLabel title = new JLabel(whiteboard.getName());
+        title.setAlignmentX(CENTER_ALIGNMENT);
 
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));

@@ -53,6 +53,7 @@ public class FirebaseController {
      */
     public void createWhiteboard(Whiteboard whiteboard, DrawHandler drawHandler, PassFailHandler valueExistsHandler) {
         DatabaseReference ref = database.getReference(whiteboard.getName());
+        whiteboard.addUser(whiteboard.getCreator());
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -86,7 +87,7 @@ public class FirebaseController {
 
                     @Override
                     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                        model.updateRow(dataSnapshot.getValue(Whiteboard.class));
                     }
 
                     @Override

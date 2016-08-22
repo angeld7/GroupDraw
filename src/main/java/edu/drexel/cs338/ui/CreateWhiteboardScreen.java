@@ -1,5 +1,6 @@
 package edu.drexel.cs338.ui;
 
+import edu.drexel.cs338.constants.UIConstants;
 import edu.drexel.cs338.interfaces.PassFailHandler;
 import edu.drexel.cs338.data.FirebaseController;
 import edu.drexel.cs338.data.Whiteboard;
@@ -16,12 +17,6 @@ import java.util.List;
  * Created by Angel on 8/15/2016.
  */
 public class CreateWhiteboardScreen extends JPanel {
-    private static final String CREATE_WHITEBOARD = "Create Whiteboard";
-    private static final String YOUR_NAME = "Your Name";
-    private static final String WHITEBOARD_NAME = "Whiteboard Name";
-    private static final String PASSWORD_OPTIONAL = "Password (Optional)";
-    private static final String CREATE = "Create";
-    private static final String WHITEBOARD_NAME_IN_USE = "The whiteboard name is already in use";
 
     /**
      * Specifies the fields that ar currently failing validation
@@ -52,7 +47,7 @@ public class CreateWhiteboardScreen extends JPanel {
     }
 
     private void initComponents() {
-        title = new JLabel(CREATE_WHITEBOARD);
+        title = new JLabel(UIConstants.CREATE_WHITEBOARD);
         title.setFont(new Font("Sans-Serif", Font.BOLD, 25));
         title.setBorder(BorderFactory.createEmptyBorder(100, 0, 0, 0));
         title.setAlignmentX(CENTER_ALIGNMENT);
@@ -62,7 +57,7 @@ public class CreateWhiteboardScreen extends JPanel {
         errorLabel = new JLabel("");
         errorLabel.setForeground(Color.RED);
         errorLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
-        createButton = new JButton(CREATE);
+        createButton = new JButton(UIConstants.CREATE);
         cancelButton = new CancelButton(controller);
         fields.add(nameField);
         fields.add(whiteBoardTextField);
@@ -85,8 +80,8 @@ public class CreateWhiteboardScreen extends JPanel {
             }
         };
 
-        FormUtility.addRequiredValidator(nameField, passFailHandler, YOUR_NAME);
-        FormUtility.addRequiredValidator(whiteBoardTextField, passFailHandler, WHITEBOARD_NAME);
+        FormUtility.addRequiredValidator(nameField, passFailHandler, UIConstants.YOUR_NAME);
+        FormUtility.addRequiredValidator(whiteBoardTextField, passFailHandler, UIConstants.WHITEBOARD_NAME);
 
         createButton.addActionListener(e -> {
             createButton.setEnabled(false);
@@ -112,7 +107,7 @@ public class CreateWhiteboardScreen extends JPanel {
                         cancelButton.setEnabled(true);
                         FormUtility.validationFailed(whiteBoardTextField);
                         whiteBoardTextField.requestFocus();
-                        passFailHandler.fail(WHITEBOARD_NAME_IN_USE, whiteBoardTextField);
+                        passFailHandler.fail(UIConstants.WHITEBOARD_NAME_IN_USE, whiteBoardTextField);
                     }
                 });
             }
@@ -122,13 +117,13 @@ public class CreateWhiteboardScreen extends JPanel {
     private void addComponents() {
         add(title);
         JPanel formPanel = new JPanel(new GridBagLayout());
-        FormUtility.addRequiredLabel(YOUR_NAME, formPanel);
+        FormUtility.addRequiredLabel(UIConstants.YOUR_NAME, formPanel);
         FormUtility.addLastField(nameField, formPanel);
 
-        FormUtility.addRequiredLabel(WHITEBOARD_NAME, formPanel);
+        FormUtility.addRequiredLabel(UIConstants.WHITEBOARD_NAME, formPanel);
         FormUtility.addLastField(whiteBoardTextField, formPanel);
 
-        FormUtility.addLabel(PASSWORD_OPTIONAL, formPanel);
+        FormUtility.addLabel(UIConstants.PASSWORD_OPTIONAL, formPanel);
         FormUtility.addLastField(passwordTextField, formPanel);
 
         formPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 100, 0));
