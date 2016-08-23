@@ -3,7 +3,7 @@
     ald363
     Project
     Group Draw
-    =============
+=============
 
 
     -------------
@@ -16,24 +16,12 @@
       Running It
       -------------
 		Build Command:
-		    ant
+		    ant build
+
 		Run Command:
-		    java edu.drexel.cs338.GroupDraw
+		    ant run
 
+		Clean command:
+		    ant clean
 
-	-------------
-	What Works
-	-------------
-
-
-
-	  -------------
-	  What doesn't
-	  -------------
-
-
-
-	    -------------
-	    NOTES
-	    -------------
 

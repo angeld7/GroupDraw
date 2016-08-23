@@ -94,7 +94,7 @@ public class WhiteboardScreen extends JPanel {
 
         Dimension buttonDimension = new Dimension(50, 50);
 
-        ImageIcon markerIcon = new ImageIcon("img/marker.png");
+        ImageIcon markerIcon = new ImageIcon(Toolkit.getDefaultToolkit().getImage("img/marker.png"));
         Image markerImg = markerIcon.getImage();
         markerButton = new JButton(new ImageIcon(markerImg.getScaledInstance(
                 (int) buttonDimension.getWidth(),
@@ -109,7 +109,7 @@ public class WhiteboardScreen extends JPanel {
             drawHandler.setErasing(false);
         });
 
-        ImageIcon eraserIcon = new ImageIcon("img/eraser.png");
+        ImageIcon eraserIcon = new ImageIcon(Toolkit.getDefaultToolkit().getImage("img/eraser.png"));
         Image eraserImg = eraserIcon.getImage();
         eraserButton = new JButton(new ImageIcon(eraserImg.getScaledInstance(
                 (int) buttonDimension.getWidth(),

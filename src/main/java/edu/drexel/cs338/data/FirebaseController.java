@@ -4,15 +4,11 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.*;
 import com.google.firebase.internal.*;
-import com.google.firebase.internal.Base64;
-import com.google.firebase.tasks.OnCompleteListener;
-import com.google.firebase.tasks.Task;
 import edu.drexel.cs338.interfaces.DrawHandler;
 import edu.drexel.cs338.interfaces.PassFailHandler;
 import edu.drexel.cs338.interfaces.WhiteboardDeleteListener;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;

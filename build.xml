@@ -1,5 +1,19 @@
-<project default="compile">
-    <target name="compile">
-        <javac srcdir="src" destdir="."/>
+<project default="build">
+    <target name="build">
+        <mkdir dir="bin"/>
+        <unzip dest="bin">
+            <fileset dir ="lib"/>
+        </unzip>
+        <javac srcdir="src" destdir="bin" classpath="bin"/>
+        <copydir src="conf" dest="bin/conf"/>
+        <copydir src="img" dest="bin/img"/>
+    </target>
+    <target name="run">
+        <exec executable="java" dir="bin">
+              <arg value="edu.drexel.cs338.GroupDraw"/>
+        </exec>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
     </target>
 </project>
