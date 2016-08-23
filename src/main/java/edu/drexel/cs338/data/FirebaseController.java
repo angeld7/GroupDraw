@@ -13,6 +13,7 @@ import edu.drexel.cs338.interfaces.WhiteboardDeleteListener;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
@@ -234,7 +235,7 @@ public class FirebaseController {
         imageRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getValue() != null) {
+                if (dataSnapshot.getValue() != null) {
                     String bytes = dataSnapshot.getValue(String.class);
                     InputStream inputStream = new ByteArrayInputStream(Base64Utils.decode(bytes));
                     try {
@@ -253,11 +254,13 @@ public class FirebaseController {
         });
     }
 
-    public void exitWhiteboard(String user, String whiteboardName) {
-        database.getReference(whiteboardName + "/users/" + user).removeValue().addOnCompleteListener(task -> checkAndRemoveWhiteboard(whiteboardName));
+    public void exitWhiteboard(String user, String whiteboardName, ActionListener afterExit) {
+        database.getReference(whiteboardName + "/users/" + user).removeValue().addOnCompleteListener(task -> {
+            checkAndRemoveWhiteboard(whiteboardName, afterExit);
+        });
     }
 
-    private void checkAndRemoveWhiteboard(String name) {
+    private void checkAndRemoveWhiteboard(String name, ActionListener afterExit) {
         DatabaseReference ref = database.getReference(name + "/users");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -265,6 +268,7 @@ public class FirebaseController {
                 if (dataSnapshot.getChildrenCount() == 0) {
                     database.getReference(name).removeValue();
                 }
+                afterExit.actionPerformed(null);
             }
 
             @Override

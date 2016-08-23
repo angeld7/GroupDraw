@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -40,7 +41,7 @@ public class WhiteboardScreen extends JPanel {
     private WindowListener windowListener = new WindowAdapter() {
         @Override
         public void windowClosing(WindowEvent e) {
-            if (exit()) System.exit(0);
+            exit(ev -> System.exit(0));
         }
     };
 
@@ -114,12 +115,12 @@ public class WhiteboardScreen extends JPanel {
         eraserButton.addActionListener(e -> drawHandler.setErasing(true));
 
         exitButton = new JButton("Exit");
-        exitButton.addActionListener(e -> {
-            if (exit()) {
+        exitButton.addActionListener(e ->
+            exit(ev -> {
                 controller.goToTitleScreen();
                 controller.removeWindowListener(windowListener);
-            }
-        });
+            })
+        );
         saveButton = new JButton("Save");
         saveButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
@@ -150,12 +151,11 @@ public class WhiteboardScreen extends JPanel {
         userTable.setModel(model);
     }
 
-    private boolean exit() {
+    private void exit(ActionListener afterExit) {
         boolean exit = JOptionPane.showConfirmDialog(this, "The room will be DELETED if you are the last to leave. Unsaved work will be LOST.\n\nAre you sure you would like to leave this whiteboard?", "Please Confirm", JOptionPane.YES_NO_OPTION) == 0;
         if (exit) {
-            FirebaseController.get().exitWhiteboard(userName, whiteboard.getName());
+            FirebaseController.get().exitWhiteboard(userName, whiteboard.getName(), afterExit);
         }
-        return exit;
     }
 
     private void addComponents() {

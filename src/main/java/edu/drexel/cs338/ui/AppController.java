@@ -53,7 +53,7 @@ public class AppController {
 
     public void removeWindowListener(WindowListener listener) {
         frame.removeWindowListener(listener);
-        if (frame.getWindowListeners().length < 1) frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
 }
