@@ -185,14 +185,19 @@ public class DrawHandler implements MouseListener, MouseMotionListener {
             }
         }
         if(drawing) {
-            Point previous = currentLine.get(0);
-            synchronized (GRAPHICS_LOCK) {
-                for (Point point : new ArrayList<>(currentLine)) {
-                    g2d.drawLine(
-                            (int) previous.getX(),
-                            (int) previous.getY(),
-                            (int) point.getX(),
-                            (int) point.getY());
+            List<Point> line = new ArrayList<>(currentLine);
+            if(line.size() > 1) {
+                Point previous = line.get(0);
+                synchronized (GRAPHICS_LOCK) {
+                    for (int x = 1; x < line.size(); x++) {
+                        Point point = line.get(x);
+                        g2d.drawLine(
+                                (int) previous.getX(),
+                                (int) previous.getY(),
+                                (int) point.getX(),
+                                (int) point.getY());
+                        previous = point;
+                    }
                 }
             }
         }

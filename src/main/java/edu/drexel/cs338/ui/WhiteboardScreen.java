@@ -102,7 +102,12 @@ public class WhiteboardScreen extends JPanel {
                 Image.SCALE_SMOOTH)));
         markerButton.setPreferredSize(buttonDimension);
         markerButton.setMaximumSize(buttonDimension);
-        markerButton.addActionListener(e -> drawHandler.setErasing(false));
+        markerButton.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
+        markerButton.addActionListener(e -> {
+            markerButton.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
+            eraserButton.setBorder(BorderFactory.createEmptyBorder());
+            drawHandler.setErasing(false);
+        });
 
         ImageIcon eraserIcon = new ImageIcon("img/eraser.png");
         Image eraserImg = eraserIcon.getImage();
@@ -112,7 +117,11 @@ public class WhiteboardScreen extends JPanel {
                 Image.SCALE_SMOOTH)));
         eraserButton.setPreferredSize(buttonDimension);
         eraserButton.setMaximumSize(buttonDimension);
-        eraserButton.addActionListener(e -> drawHandler.setErasing(true));
+        eraserButton.addActionListener(e -> {
+            eraserButton.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
+            markerButton.setBorder(BorderFactory.createEmptyBorder());
+            drawHandler.setErasing(true);
+        });
 
         exitButton = new JButton("Exit");
         exitButton.addActionListener(e ->
