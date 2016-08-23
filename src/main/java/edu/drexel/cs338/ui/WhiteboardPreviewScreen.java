@@ -2,26 +2,60 @@ package edu.drexel.cs338.ui;
 
 import com.google.common.collect.Lists;
 import edu.drexel.cs338.constants.UIConstants;
+import edu.drexel.cs338.data.FirebaseController;
+import edu.drexel.cs338.data.UserTableModel;
 import edu.drexel.cs338.data.Whiteboard;
+import edu.drexel.cs338.interfaces.InputValidationPassFailHandler;
 import edu.drexel.cs338.ui.components.*;
 import edu.drexel.cs338.utility.FormUtility;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Vector;
+import java.awt.event.ActionListener;
+import java.util.*;
 
 /**
  * Created by Angel on 8/21/2016.
  */
-public class WhiteboardPreviewScreen extends JPanel{
+public class WhiteboardPreviewScreen extends JPanel {
+
+    /**
+     * Specifies the fields that ar currently failing validation
+     */
+    final private Set<JComponent> erroredComponents = new HashSet<>();
+
+    /**
+     * All fields on the form
+     */
+
+    final private java.util.List<JComponent> fields = new LinkedList<>();
     private AppController controller;
     private Whiteboard whiteboard;
     private JLabel title;
     private JButton joinButton;
     private JTextField nameField;
-    private JTextField passwordField;
+    private JPasswordField passwordField;
     private JTable userTable;
+    private JLabel errorLabel;
+    private JButton cancelButton;
+
+    InputValidationPassFailHandler passFailHandler = new InputValidationPassFailHandler() {
+        @Override
+        public void fail(String message, JComponent component) {
+            synchronized (erroredComponents) {
+                erroredComponents.add(component);
+            }
+            errorLabel.setText(message);
+        }
+
+        @Override
+        public void pass(JComponent component) {
+            synchronized (erroredComponents) {
+                erroredComponents.remove(component);
+            }
+            errorLabel.setText("");
+        }
+    };
 
     public WhiteboardPreviewScreen(AppController controller, Whiteboard whiteboard) {
         super(new BorderLayout());
@@ -29,6 +63,11 @@ public class WhiteboardPreviewScreen extends JPanel{
         this.whiteboard = whiteboard;
         initComponents();
         addComponents();
+        FirebaseController.get().addDeleteListener(wb -> {
+            if (whiteboard.equals(wb)) {
+                controller.goBack();
+            }
+        });
     }
 
     private void initComponents() {
@@ -39,37 +78,80 @@ public class WhiteboardPreviewScreen extends JPanel{
         title.setHorizontalAlignment(JLabel.CENTER);
         setAlignmentX(CENTER_ALIGNMENT);
 
+        userTable = new UserTable();
+        UserTableModel model = new UserTableModel(whiteboard.getName(), userTable);
+        userTable.setModel(model);
+
+        ActionListener actionListener = e -> {
+            if (!joinButton.isEnabled()) return;
+            if (!hasErrors()) {
+                if (model.containsUser(nameField.getText())) {
+                    FormUtility.validationFailed(nameField);
+                    nameField.requestFocus();
+                    passFailHandler.fail(UIConstants.NAME_IN_USE, nameField);
+                } else if (!whiteboard.getPassword().isEmpty() && !whiteboard.getPassword().equals(String.valueOf(passwordField.getPassword()))) {
+                    FormUtility.validationFailed(passwordField);
+                    passwordField.requestFocus();
+                    passFailHandler.fail(UIConstants.INCORRECT_PASSWORD, passwordField);
+                } else {
+                    WhiteboardScreen screen = new WhiteboardScreen(controller, whiteboard, nameField.getText());
+                    controller.display(screen);
+                    screen.createImage();
+                }
+            }
+        };
+
         nameField = new JTextField();
-        if(!whiteboard.getPassword().isEmpty()) {
+        nameField.addActionListener(actionListener);
+        if (!whiteboard.getPassword().isEmpty()) {
             passwordField = new JPasswordField();
+            passwordField.addActionListener(actionListener);
         }
 
-        //userTable = new JTable(new Vector(whiteboard.getUsers()), Lists.asList("String", null));
+        cancelButton = new CancelButton(controller);
 
         joinButton = new JButton(UIConstants.JOIN);
+        joinButton.addActionListener(actionListener);
+
+        errorLabel = new JLabel();
+        errorLabel.setForeground(Color.RED);
+        errorLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+
+        FormUtility.addRequiredValidator(nameField, passFailHandler, UIConstants.YOUR_NAME);
+        fields.add(nameField);
+        if (!whiteboard.getPassword().isEmpty()) {
+            fields.add(passwordField);
+            FormUtility.addRequiredValidator(passwordField, passFailHandler, UIConstants.WHITEBOARD_PASSWORD);
+        }
+
+        SwingUtilities.invokeLater(() -> nameField.requestFocus());
     }
 
     private void addComponents() {
 
-        JPanel middlePanel = new JPanel();
-        middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.X_AXIS));
+        JPanel middlePanel = new JPanel(new BorderLayout());
 
         JPanel form = new JPanel(new GridBagLayout());
-        FormUtility.addLabel(UIConstants.YOUR_NAME, form);
+        FormUtility.addRequiredLabel(UIConstants.YOUR_NAME, form);
         FormUtility.addLastField(nameField, form);
-        if(passwordField != null) {
-            FormUtility.addLabel(UIConstants.WHITEBOARD_PASSWORD, form);
+        if (passwordField != null) {
+            FormUtility.addRequiredLabel(UIConstants.WHITEBOARD_PASSWORD, form);
             FormUtility.addLastField(passwordField, form);
         }
 
-        middlePanel.add(form);
+        JScrollPane scrollPane = new JScrollPane(userTable);
+        scrollPane.setPreferredSize(new Dimension(400, 800));
+
+        middlePanel.add(form, BorderLayout.CENTER);
+        middlePanel.add(scrollPane, BorderLayout.EAST);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
         buttonPanel.add(Box.createHorizontalGlue());
+        buttonPanel.add(errorLabel);
         buttonPanel.add(joinButton);
-        buttonPanel.add(new CancelButton(controller));
+        buttonPanel.add(cancelButton);
 
         add(title, BorderLayout.NORTH);
         add(middlePanel, BorderLayout.CENTER);
@@ -77,4 +159,34 @@ public class WhiteboardPreviewScreen extends JPanel{
     }
 
 
+    /**
+     * Validates all fields
+     *
+     * @return
+     */
+    public boolean hasErrors() {
+        boolean error;
+        synchronized (erroredComponents) {
+            error = erroredComponents.size() > 0;
+        }
+        Iterator<JComponent> iterator = fields.iterator();
+        while (!error && iterator.hasNext()) {
+            JComponent component = iterator.next();
+            InputVerifier verifier = component.getInputVerifier();
+            if (verifier != null) {
+                component.getInputVerifier().verify(component);
+            }
+        }
+        synchronized (erroredComponents) {
+            if (erroredComponents.size() > 0) {
+                JComponent component = erroredComponents.iterator().next();
+                InputVerifier verifier = component.getInputVerifier();
+                verifier.verify(component);
+                component.requestFocus();
+                error = true;
+            }
+        }
+
+        return error;
+    }
 }

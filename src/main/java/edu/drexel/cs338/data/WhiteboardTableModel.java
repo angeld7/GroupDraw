@@ -1,7 +1,5 @@
 package edu.drexel.cs338.data;
 
-import com.google.firebase.database.DataSnapshot;
-
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -14,12 +12,11 @@ public class WhiteboardTableModel implements TableModel {
 
     JTable table;
     List<Whiteboard> data = new ArrayList<>();
-    List<String> columns;
+    List<String> columns = Arrays.asList("Name", "Creator", "Users", "Password");
 
     public WhiteboardTableModel(JTable table) {
         this.table = table;
-        FirebaseController.get().getWhiteboardList(this);
-        columns = Arrays.asList("Name", "Creator", "Users", "Password");
+        FirebaseController.get().setupWhiteboardTableModel(this);
     }
 
     @Override
@@ -95,7 +92,7 @@ public class WhiteboardTableModel implements TableModel {
     }
 
     public void addRow(Whiteboard whiteboard) {
-        if(!data.contains(whiteboard)) {
+        if (!data.contains(whiteboard)) {
             data.add(whiteboard);
             refreshData();
         }
@@ -107,7 +104,7 @@ public class WhiteboardTableModel implements TableModel {
     }
 
     public void updateRow(Whiteboard whiteboard) {
-        if(data.contains(whiteboard)) {
+        if (data.contains(whiteboard)) {
             data.remove(whiteboard);
             data.add(whiteboard);
             refreshData();

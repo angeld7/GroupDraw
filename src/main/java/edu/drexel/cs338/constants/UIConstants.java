@@ -14,4 +14,7 @@ public class UIConstants {
     public static final String JOIN = "Join";
     public static final String JOIN_WHITEBOARD = "Join Whiteboard";
     public static final String WHITEBOARD_PASSWORD = "Whiteboard Password";
+    public static final String VIEW = "View";
+    public static final String NAME_IN_USE = "User name is already in use";
+    public static final String INCORRECT_PASSWORD = "The password you entered is incorrect";
 }

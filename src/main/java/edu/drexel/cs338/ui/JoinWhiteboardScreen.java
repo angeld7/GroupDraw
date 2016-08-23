@@ -6,6 +6,8 @@ import edu.drexel.cs338.ui.components.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 /**
@@ -36,10 +38,14 @@ public class JoinWhiteboardScreen extends JPanel {
                 thing[x] = "data!";
             }
         }
+
         whiteboardList = new JTable();
         WhiteboardTableModel model = new WhiteboardTableModel(whiteboardList);
         whiteboardList.setModel(model);
         whiteboardList.setFillsViewportHeight(true);
+
+        ActionListener actionListener = e ->
+                controller.display(new WhiteboardPreviewScreen(controller, model.getRow(whiteboardList.getSelectedRow())));
 
         whiteboardList.setRowSelectionAllowed(true);
         whiteboardList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -48,11 +54,16 @@ public class JoinWhiteboardScreen extends JPanel {
                 joinButton.setEnabled(true);
             }
         });
+        whiteboardList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "performAction");
+        whiteboardList.getActionMap().put("performAction", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                actionListener.actionPerformed(e);
+            }
+        });
 
-        joinButton = new JButton(UIConstants.JOIN);
-        joinButton.addActionListener(e ->
-                controller.display(new WhiteboardPreviewScreen(controller, model.getRow(whiteboardList.getSelectedRow())))
-        );
+        joinButton = new JButton(UIConstants.VIEW);
+        joinButton.addActionListener(actionListener);
         joinButton.setEnabled(false);
     }
 

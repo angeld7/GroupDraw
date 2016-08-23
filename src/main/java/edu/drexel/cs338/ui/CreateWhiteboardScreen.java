@@ -10,6 +10,7 @@ import edu.drexel.cs338.ui.components.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
 
@@ -33,10 +34,28 @@ public class CreateWhiteboardScreen extends JPanel {
     JTextField nameField;
     JLabel title;
     JTextField whiteBoardTextField;
-    JTextField passwordTextField;
+    JPasswordField passwordTextField;
     JLabel errorLabel;
     JButton cancelButton;
     JButton createButton;
+
+    InputValidationPassFailHandler passFailHandler = new InputValidationPassFailHandler() {
+        @Override
+        public void fail(String message, JComponent component) {
+            synchronized (erroredComponents) {
+                erroredComponents.add(component);
+            }
+            errorLabel.setText(message);
+        }
+
+        @Override
+        public void pass(JComponent component) {
+            synchronized (erroredComponents) {
+                erroredComponents.remove(component);
+            }
+            errorLabel.setText("");
+        }
+    };
 
     public CreateWhiteboardScreen(AppController controller) {
         super();
@@ -47,56 +66,19 @@ public class CreateWhiteboardScreen extends JPanel {
     }
 
     private void initComponents() {
-        title = new JLabel(UIConstants.CREATE_WHITEBOARD);
-        title.setFont(new Font("Sans-Serif", Font.BOLD, 25));
-        title.setBorder(BorderFactory.createEmptyBorder(100, 0, 0, 0));
-        title.setAlignmentX(CENTER_ALIGNMENT);
-        nameField = new JTextField();
-        whiteBoardTextField = new JTextField();
-        passwordTextField = new JTextField();
-        errorLabel = new JLabel("");
-        errorLabel.setForeground(Color.RED);
-        errorLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
-        createButton = new JButton(UIConstants.CREATE);
-        cancelButton = new CancelButton(controller);
-        fields.add(nameField);
-        fields.add(whiteBoardTextField);
-
-        InputValidationPassFailHandler passFailHandler = new InputValidationPassFailHandler() {
-            @Override
-            public void fail(String message, JComponent component) {
-                synchronized (erroredComponents) {
-                    erroredComponents.add(component);
-                }
-                errorLabel.setText(message);
-            }
-
-            @Override
-            public void pass(JComponent component) {
-                synchronized (erroredComponents) {
-                    erroredComponents.remove(component);
-                }
-                errorLabel.setText("");
-            }
-        };
-
-        FormUtility.addRequiredValidator(nameField, passFailHandler, UIConstants.YOUR_NAME);
-        FormUtility.addRequiredValidator(whiteBoardTextField, passFailHandler, UIConstants.WHITEBOARD_NAME);
-
-        createButton.addActionListener(e -> {
-            createButton.setEnabled(false);
-            cancelButton.setEnabled(false);
+        ActionListener actionListener = e -> {
+            if (!createButton.isEnabled()) return;
             if (!hasErrors()) {
+                createButton.setEnabled(false);
+                cancelButton.setEnabled(false);
                 Whiteboard whiteboard = new Whiteboard(
                         whiteBoardTextField.getText(),
                         nameField.getText(),
-                        passwordTextField.getText());
-
-                WhiteboardScreen screen = new WhiteboardScreen(controller, whiteboard);
-
-                FirebaseController.get().createWhiteboard(whiteboard, screen.getDrawHandler(), new PassFailHandler() {
+                        String.valueOf(passwordTextField.getPassword()));
+                FirebaseController.get().createWhiteboard(whiteboard, new PassFailHandler() {
                     @Override
                     public void pass() {
+                        WhiteboardScreen screen = new WhiteboardScreen(controller, whiteboard, whiteboard.getCreator());
                         controller.display(screen);
                         screen.createImage();
                     }
@@ -111,7 +93,31 @@ public class CreateWhiteboardScreen extends JPanel {
                     }
                 });
             }
-        });
+        };
+
+        title = new JLabel(UIConstants.CREATE_WHITEBOARD);
+        title.setFont(new Font("Sans-Serif", Font.BOLD, 25));
+        title.setBorder(BorderFactory.createEmptyBorder(100, 0, 0, 0));
+        title.setAlignmentX(CENTER_ALIGNMENT);
+        nameField = new JTextField();
+        nameField.addActionListener(actionListener);
+        whiteBoardTextField = new JTextField();
+        whiteBoardTextField.addActionListener(actionListener);
+        passwordTextField = new JPasswordField();
+        passwordTextField.addActionListener(actionListener);
+        errorLabel = new JLabel("");
+        errorLabel.setForeground(Color.RED);
+        errorLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+        createButton = new JButton(UIConstants.CREATE);
+        cancelButton = new CancelButton(controller);
+        fields.add(nameField);
+        fields.add(whiteBoardTextField);
+
+        FormUtility.addRequiredValidator(nameField, passFailHandler, UIConstants.YOUR_NAME);
+        FormUtility.addRequiredValidator(whiteBoardTextField, passFailHandler, UIConstants.WHITEBOARD_NAME);
+
+        createButton.addActionListener(actionListener);
+        SwingUtilities.invokeLater(() -> nameField.requestFocus());
     }
 
     private void addComponents() {

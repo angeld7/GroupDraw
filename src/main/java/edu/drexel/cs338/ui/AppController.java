@@ -1,6 +1,7 @@
 package edu.drexel.cs338.ui;
 
 import javax.swing.*;
+import java.awt.event.WindowListener;
 import java.util.Stack;
 
 /**
@@ -18,7 +19,7 @@ public class AppController {
 
     private void display(JPanel panel, boolean pushCurrent) {
         if (current != null) {
-            if(pushCurrent) navStack.push(current);
+            if (pushCurrent) navStack.push(current);
             frame.remove(current);
         }
         current = panel;
@@ -44,4 +45,15 @@ public class AppController {
         frame.repaint();
         frame.pack();
     }
+
+    public void addWindowListener(WindowListener listener) {
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(listener);
+    }
+
+    public void removeWindowListener(WindowListener listener) {
+        frame.removeWindowListener(listener);
+        if (frame.getWindowListeners().length < 1) frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
+
 }

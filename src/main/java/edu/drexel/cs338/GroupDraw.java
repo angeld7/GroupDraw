@@ -23,7 +23,7 @@ public class GroupDraw {
     private void createAndShowGUI() {
         final JFrame frame = new JFrame(UIConstants.TITLE);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setPreferredSize(new Dimension(800, 600));
+        frame.setPreferredSize(new Dimension(1000, 720));
 
         AppController controller = new AppController(frame);
         controller.display(new TitleScreen(controller));

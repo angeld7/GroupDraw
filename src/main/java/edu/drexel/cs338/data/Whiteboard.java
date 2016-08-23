@@ -1,7 +1,9 @@
 package edu.drexel.cs338.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Angel on 8/21/2016.
@@ -10,7 +12,9 @@ public class Whiteboard {
     private String name;
     private String creator;
     private String password;
-    private List<String> users = new ArrayList<>();
+    private Map<String, String> users = new HashMap<>();
+
+    private String image;
 
     public Whiteboard() {
     }
@@ -45,18 +49,26 @@ public class Whiteboard {
         this.password = password;
     }
 
-    public List<String> getUsers() {
+    public Map<String, String> getUsers() {
         return users;
     }
 
-    public void setUsers(List<String> users) {
+    public void setUsers(Map<String, String> users) {
         this.users = users;
     }
 
-    public void addUser(String user) {
-        if(!users.contains(user)) {
-            users.add(user);
+    public void addUser(String id, String user) {
+        if (!users.containsKey(id)) {
+            users.put(id, user);
         }
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     @Override
