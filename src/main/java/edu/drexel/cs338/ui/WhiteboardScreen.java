@@ -71,10 +71,15 @@ public class WhiteboardScreen extends JPanel {
         colorButton.setPreferredSize(topInputsDimension);
         colorButton.setMaximumSize(colorButton.getPreferredSize());
         colorButton.setBackground(drawHandler.getColor());
+        colorButton.setForeground(drawHandler.getColor());
+        colorButton.setBorder(BorderFactory.createStrokeBorder(new BasicStroke(10)));
+        colorButton.setBorderPainted(true);
         colorButton.addActionListener(e -> {
             Color color = JColorChooser.showDialog(this, "Choose a color", drawHandler.getColor());
             colorButton.setBackground(color);
+            colorButton.setForeground(color);
             drawHandler.setColor(color);
+
             controller.refresh();
         });
 
