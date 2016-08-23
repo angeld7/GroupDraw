@@ -174,10 +174,7 @@ public class WhiteboardPreviewScreen extends JPanel {
      * @return
      */
     public boolean hasErrors() {
-        boolean error;
-        synchronized (erroredComponents) {
-            error = erroredComponents.size() > 0;
-        }
+        boolean error = false;
         Iterator<JComponent> iterator = fields.iterator();
         while (!error && iterator.hasNext()) {
             JComponent component = iterator.next();
@@ -188,11 +185,13 @@ public class WhiteboardPreviewScreen extends JPanel {
         }
         synchronized (erroredComponents) {
             if (erroredComponents.size() > 0) {
-                JComponent component = erroredComponents.iterator().next();
-                InputVerifier verifier = component.getInputVerifier();
-                verifier.verify(component);
-                component.requestFocus();
-                error = true;
+                while(iterator.hasNext()) {
+                    JComponent component = erroredComponents.iterator().next();
+                    InputVerifier verifier = component.getInputVerifier();
+                    verifier.verify(component);
+                    component.requestFocus();
+                    error = true;
+                }
             }
         }
 

@@ -153,10 +153,7 @@ public class CreateWhiteboardScreen extends JPanel {
      * @return
      */
     public boolean hasErrors() {
-        boolean error;
-        synchronized (erroredComponents) {
-            error = erroredComponents.size() > 0;
-        }
+        boolean error = false;
         Iterator<JComponent> iterator = fields.iterator();
         while (!error && iterator.hasNext()) {
             JComponent component = iterator.next();
