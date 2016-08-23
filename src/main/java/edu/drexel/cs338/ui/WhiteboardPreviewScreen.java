@@ -6,6 +6,7 @@ import edu.drexel.cs338.data.FirebaseController;
 import edu.drexel.cs338.data.UserTableModel;
 import edu.drexel.cs338.data.Whiteboard;
 import edu.drexel.cs338.interfaces.InputValidationPassFailHandler;
+import edu.drexel.cs338.interfaces.WhiteboardDeleteListener;
 import edu.drexel.cs338.ui.components.*;
 import edu.drexel.cs338.utility.FormUtility;
 
@@ -39,6 +40,16 @@ public class WhiteboardPreviewScreen extends JPanel {
     private JLabel errorLabel;
     private JButton cancelButton;
 
+    WhiteboardDeleteListener deleteListener = new WhiteboardDeleteListener() {
+        @Override
+        public void onDelete(Whiteboard whiteboard) {
+            if (whiteboard.equals(whiteboard)) {
+                controller.goBack();
+            }
+            FirebaseController.get().removeDeleteListener(this);
+        }
+    };
+
     InputValidationPassFailHandler passFailHandler = new InputValidationPassFailHandler() {
         @Override
         public void fail(String message, JComponent component) {
@@ -63,11 +74,7 @@ public class WhiteboardPreviewScreen extends JPanel {
         this.whiteboard = whiteboard;
         initComponents();
         addComponents();
-        FirebaseController.get().addDeleteListener(wb -> {
-            if (whiteboard.equals(wb)) {
-                controller.goBack();
-            }
-        });
+        FirebaseController.get().addDeleteListener(deleteListener);
     }
 
     private void initComponents() {
@@ -94,6 +101,7 @@ public class WhiteboardPreviewScreen extends JPanel {
                     passwordField.requestFocus();
                     passFailHandler.fail(UIConstants.INCORRECT_PASSWORD, passwordField);
                 } else {
+                    FirebaseController.get().removeDeleteListener(deleteListener);
                     WhiteboardScreen screen = new WhiteboardScreen(controller, whiteboard, nameField.getText());
                     controller.display(screen);
                     screen.createImage();
@@ -109,6 +117,7 @@ public class WhiteboardPreviewScreen extends JPanel {
         }
 
         cancelButton = new CancelButton(controller);
+        cancelButton.addActionListener(e -> FirebaseController.get().removeDeleteListener(deleteListener));
 
         joinButton = new JButton(UIConstants.JOIN);
         joinButton.addActionListener(actionListener);
